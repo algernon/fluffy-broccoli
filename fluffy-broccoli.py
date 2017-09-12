@@ -18,15 +18,14 @@
 from mpd import MPDClient
 from mastodon import Mastodon
 
+import configparser
 import io
 import os
 import os.path
 import sh
 
 CONFIG_DIR = os.path.expanduser("~/.config/fluffy-broccoli")
-CLIENT_CREDS = os.path.join(CONFIG_DIR, "client.creds")
-USER_CREDS = os.path.join(CONFIG_DIR, "user.creds")
-CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
+CONFIG_FILE = os.path.join(CONFIG_DIR, "config.ini")
 
 WANT_MUSICBRAINZ = False
 
@@ -76,11 +75,14 @@ def mainLoop(mastodonClient, mpdClient):
 
 def loadConfig():
     print("# Loading configuration...")
-    with open(CONFIG_FILE, "r") as f:
-        config = f.read()
+    config = configparser.ConfigParser()
+    config.read(CONFIG_FILE)
     return config
 
 def configure():
+    def opener(path, flags):
+        return os.open(path, flags, mode=0o600)
+
     print ("# Configuring fluffy-broccoli")
     instanceURL = input("Enter the URL of your instance: ")
     userName = input("Enter your email (used only for initial setup): ")
@@ -88,36 +90,42 @@ def configure():
 
     os.makedirs(CONFIG_DIR, exist_ok=True)
 
-    Mastodon.create_app(
+    cID, cSecret = Mastodon.create_app(
         "fluffy-broccoli",
         api_base_url=instanceURL,
-        to_file=CLIENT_CREDS,
     )
-    os.chmod(CLIENT_CREDS, 0o600)
 
     botAPI = Mastodon(
         api_base_url=instanceURL,
-        client_id = CLIENT_CREDS,
+        client_id = cID,
+        client_secret = cSecret
     )
-    botAPI.log_in(
+    accessToken = botAPI.log_in(
         userName,
         password,
-        to_file = USER_CREDS,
     )
-    os.chmod(USER_CREDS, 0o600)
 
-    with open(CONFIG_FILE, "w") as f:
-        f.write(instanceURL)
+    config = configparser.ConfigParser()
+    config["mastodon"] = {
+        "instance_url": instanceURL,
+        "client_id": cID,
+        "client_secret": cSecret,
+        "access_token": accessToken,
+    }
+
+    with open(CONFIG_FILE, "w", opener = opener) as f:
+        config.write(f)
 
 def main():
-    if not os.path.exists(CONFIG_FILE) or not os.path.exists(CLIENT_CREDS) or not os.path.exists(USER_CREDS):
+    if not os.path.exists(CONFIG_FILE):
         configure()
     config = loadConfig()
 
     mastodonClient = Mastodon(
-        api_base_url=config,
-        client_id=CLIENT_CREDS,
-        access_token=USER_CREDS
+        api_base_url=config["mastodon"]["instance_url"],
+        client_id=config["mastodon"]["client_id"],
+        client_secret=config["mastodon"]["client_secret"],
+        access_token=config["mastodon"]["access_token"]
     )
     mpdClient = MPDClient()
     mpdClient.connect("localhost", 6600)
