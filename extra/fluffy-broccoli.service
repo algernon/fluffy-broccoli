@@ -1,0 +1,10 @@
+[Unit]
+Description=Mastodon #NowPlaying bot
+After=mpd.service
+
+[Service]
+Type=simple
+ExecStart=/path/to/python3 /path/to/fluffy-broccoli.py
+
+[Install]
+WantedBy=default.target
