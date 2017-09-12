@@ -17,13 +17,42 @@
 
 from mpd import MPDClient
 from mastodon import Mastodon
+
+import io
 import os
 import os.path
+import sh
 
 CONFIG_DIR = os.path.expanduser("~/.config/fluffy-broccoli")
 CLIENT_CREDS = os.path.join(CONFIG_DIR, "client.creds")
 USER_CREDS = os.path.join(CONFIG_DIR, "user.creds")
 CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
+
+WANT_MUSICBRAINZ = False
+
+def findBeetRoot():
+    try:
+        buf = io.StringIO()
+        sh.cut(sh.grep(sh.beet.config(), "^directory:"), "-d", ":", "-f2", _out=buf)
+    except sh.CommandNotFound as e:
+        return None
+    return os.path.expanduser(buf.getvalue().strip())
+
+BEET_ROOT = findBeetRoot()
+
+def findMusicBrainzAlbum(file):
+    if BEET_ROOT is None:
+        return None
+    try:
+        buf = io.StringIO()
+        sh.beet.list("-f", "$mb_albumid", "path:" + os.path.join(BEET_ROOT, file), _out=buf)
+    except sh.CommandNotFound as e:
+        return None
+    id = buf.getvalue().strip()
+    if id == "":
+        return None
+    else:
+        return id
 
 def mainLoop(mastodonClient, mpdClient):
     print("# Entering main loop...")
@@ -38,6 +67,10 @@ def mainLoop(mastodonClient, mpdClient):
             continue
         previousFile = song["file"]
         nowPlaying = "{artist} - {title} ({album})".format(**song)
+        if WANT_MUSICBRAINZ:
+            albumId = findMusicBrainzAlbum(song["file"])
+            if albumId is not None and len(albumId) > 10:
+                nowPlaying += " | https://musicbrainz.org/release/" + albumId
         print(nowPlaying)
         mastodonClient.toot (nowPlaying + "\n\n#NowPlaying")
 
