@@ -4,7 +4,7 @@ After=mpd.service
 
 [Service]
 Type=simple
-ExecStart=/path/to/python3 /path/to/fluffy-broccoli.py
+ExecStart=/path/to/python3 -u /path/to/fluffy-broccoli.py
 
 [Install]
 WantedBy=default.target
