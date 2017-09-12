@@ -17,7 +17,6 @@
 
 from mpd import MPDClient
 from mastodon import Mastodon
-import argparse
 import os
 import os.path
 
