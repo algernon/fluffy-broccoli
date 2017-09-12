@@ -5,6 +5,7 @@ After=mpd.service
 [Service]
 Type=simple
 ExecStart=/path/to/python3 -u /path/to/fluffy-broccoli.py
+SyslogIdentifier=fluffy-broccoli
 
 [Install]
 WantedBy=default.target
