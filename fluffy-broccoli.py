@@ -46,14 +46,12 @@ def findBeetRoot():
         return None
     return os.path.expanduser(buf.getvalue().strip())
 
-BEET_ROOT = findBeetRoot()
-
-def findMusicBrainzAlbum(file):
-    if BEET_ROOT is None:
+def findMusicBrainzAlbum(config, file):
+    if config["fluffy-broccoli"]["beet_directory"] is None:
         return None
     try:
         buf = io.StringIO()
-        sh.beet.list("-f", "$mb_albumid", "path:" + os.path.join(BEET_ROOT, file), _out=buf)
+        sh.beet.list("-f", "$mb_albumid", "path:" + os.path.join(config["fluffy-broccoli"]["beet_directory"], file), _out=buf)
     except sh.CommandNotFound as e:
         return None
     id = buf.getvalue().strip()
@@ -76,7 +74,7 @@ def mainLoop(config, mastodonClient, mpdClient):
         previousFile = song["file"]
         nowPlaying = config["fluffy-broccoli"]["format"].format(**song)
         if config["fluffy-broccoli"].getboolean("musicbrainz_lookup"):
-            albumId = findMusicBrainzAlbum(song["file"])
+            albumId = findMusicBrainzAlbum(config, song["file"])
             if albumId is not None and len(albumId) > 10:
                 nowPlaying += " | https://musicbrainz.org/release/" + albumId
         print(nowPlaying)
@@ -87,6 +85,7 @@ def loadConfig():
     config = configparser.ConfigParser()
     config["mpd"] = DEFAULTS["mpd"]
     config["fluffy-broccoli"] = DEFAULTS["fluffy-broccoli"]
+    config["fluffy-broccoli"]["beet_directory"] = findBeetRoot()
 
     config.read(CONFIG_FILE)
     return config
