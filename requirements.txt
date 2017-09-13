@@ -1,2 +1,3 @@
 Mastodon.py
 python-mpd2
+sh
