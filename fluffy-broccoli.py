@@ -88,6 +88,9 @@ def loadConfig():
     config["fluffy-broccoli"]["beet_directory"] = findBeetRoot()
 
     config.read(CONFIG_FILE)
+
+    beet_dir = config["fluffy-broccoli"]["beet_directory"]
+    config["fluffy-broccoli"]["beet_directory"] = os.path.expanduser(beet_dir)
     return config
 
 def configure():
