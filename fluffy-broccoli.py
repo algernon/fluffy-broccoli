@@ -64,7 +64,7 @@ def mainLoop(config, mastodonClient, mpdClient):
             continue
         previousFile = song["file"]
         nowPlaying = config["fluffy-broccoli"]["format"].format(**song)
-        if config["fluffy-broccoli"]["musicbrainz_lookup"]:
+        if config["fluffy-broccoli"].getboolean("musicbrainz_lookup"):
             albumId = findMusicBrainzAlbum(song["file"])
             if albumId is not None and len(albumId) > 10:
                 nowPlaying += " | https://musicbrainz.org/release/" + albumId
