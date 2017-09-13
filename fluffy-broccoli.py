@@ -76,6 +76,10 @@ def mainLoop(mastodonClient, mpdClient):
 def loadConfig():
     print("# Loading configuration...")
     config = configparser.ConfigParser()
+    config["mpd"] = {
+        "host": "localhost",
+        "port": 6600,
+    }
     config.read(CONFIG_FILE)
     return config
 
@@ -112,6 +116,10 @@ def configure():
         "client_secret": cSecret,
         "access_token": accessToken,
     }
+    config["mpd"] = {
+        "host": "localhost",
+        "port": 6600,
+    }
 
     with open(CONFIG_FILE, "w", opener = opener) as f:
         config.write(f)
@@ -128,7 +136,7 @@ def main():
         access_token=config["mastodon"]["access_token"]
     )
     mpdClient = MPDClient()
-    mpdClient.connect("localhost", 6600)
+    mpdClient.connect(config["mpd"]["host"], config["mpd"]["port"])
 
     mainLoop(mastodonClient, mpdClient)
 
