@@ -53,7 +53,7 @@ def findMusicBrainzAlbum(file):
     else:
         return id
 
-def mainLoop(mastodonClient, mpdClient):
+def mainLoop(config, mastodonClient, mpdClient):
     print("# Entering main loop...")
     previousFile = None
 
@@ -65,7 +65,7 @@ def mainLoop(mastodonClient, mpdClient):
         if song["file"] == previousFile:
             continue
         previousFile = song["file"]
-        nowPlaying = "{artist} - {title} ({album})".format(**song)
+        nowPlaying = config["fluffy-broccoli"]["format"].format(**song)
         if WANT_MUSICBRAINZ:
             albumId = findMusicBrainzAlbum(song["file"])
             if albumId is not None and len(albumId) > 10:
@@ -80,6 +80,10 @@ def loadConfig():
         "host": "localhost",
         "port": 6600,
     }
+    config["fluffy-broccoli"] = {
+        "format": "{artist} - {title} ({album})",
+    }
+
     config.read(CONFIG_FILE)
     return config
 
@@ -120,6 +124,9 @@ def configure():
         "host": "localhost",
         "port": 6600,
     }
+    config["fluffy-broccoli"] = {
+        "format": "{artist} - {title} ({album})",
+    }
 
     with open(CONFIG_FILE, "w", opener = opener) as f:
         config.write(f)
@@ -140,7 +147,7 @@ def main():
     if "password" in config["mpd"] and config["mpd"]["password"] is not None:
         mpdClient.password(config["mpd"]["password"])
 
-    mainLoop(mastodonClient, mpdClient)
+    mainLoop(config, mastodonClient, mpdClient)
 
 if __name__ == "__main__":
     main()
