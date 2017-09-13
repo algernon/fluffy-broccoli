@@ -27,6 +27,17 @@ import sh
 CONFIG_DIR = os.path.expanduser("~/.config/fluffy-broccoli")
 CONFIG_FILE = os.path.join(CONFIG_DIR, "config.ini")
 
+DEFAULTS = {
+    "mpd": {
+        "host": "localhost",
+        "port": 6600,
+    },
+    "fluffy-broccoli": {
+        "format": "{artist} - {title} ({album})",
+        "musicbrainz_lookup": "no",
+    }
+}
+
 def findBeetRoot():
     try:
         buf = io.StringIO()
@@ -74,14 +85,8 @@ def mainLoop(config, mastodonClient, mpdClient):
 def loadConfig():
     print("# Loading configuration...")
     config = configparser.ConfigParser()
-    config["mpd"] = {
-        "host": "localhost",
-        "port": 6600,
-    }
-    config["fluffy-broccoli"] = {
-        "format": "{artist} - {title} ({album})",
-        "musicbrainz_lookup": False,
-    }
+    config["mpd"] = DEFAULTS["mpd"]
+    config["fluffy-broccoli"] = DEFAULTS["fluffy-broccoli"]
 
     config.read(CONFIG_FILE)
     return config
@@ -113,19 +118,13 @@ def configure():
     )
 
     config = configparser.ConfigParser()
+    config["mpd"] = DEFAULTS["mpd"]
+    config["fluffy-broccoli"] = DEFAULTS["fluffy-broccoli"]
     config["mastodon"] = {
         "instance_url": instanceURL,
         "client_id": cID,
         "client_secret": cSecret,
         "access_token": accessToken,
-    }
-    config["mpd"] = {
-        "host": "localhost",
-        "port": 6600,
-    }
-    config["fluffy-broccoli"] = {
-        "format": "{artist} - {title} ({album})",
-        "musicbrainz_lookup": False,
     }
 
     with open(CONFIG_FILE, "w", opener = opener) as f:
