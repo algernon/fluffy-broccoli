@@ -27,8 +27,6 @@ import sh
 CONFIG_DIR = os.path.expanduser("~/.config/fluffy-broccoli")
 CONFIG_FILE = os.path.join(CONFIG_DIR, "config.ini")
 
-WANT_MUSICBRAINZ = False
-
 def findBeetRoot():
     try:
         buf = io.StringIO()
@@ -66,7 +64,7 @@ def mainLoop(config, mastodonClient, mpdClient):
             continue
         previousFile = song["file"]
         nowPlaying = config["fluffy-broccoli"]["format"].format(**song)
-        if WANT_MUSICBRAINZ:
+        if config["fluffy-broccoli"]["musicbrainz_lookup"]:
             albumId = findMusicBrainzAlbum(song["file"])
             if albumId is not None and len(albumId) > 10:
                 nowPlaying += " | https://musicbrainz.org/release/" + albumId
@@ -82,6 +80,7 @@ def loadConfig():
     }
     config["fluffy-broccoli"] = {
         "format": "{artist} - {title} ({album})",
+        "musicbrainz_lookup": False,
     }
 
     config.read(CONFIG_FILE)
@@ -126,6 +125,7 @@ def configure():
     }
     config["fluffy-broccoli"] = {
         "format": "{artist} - {title} ({album})",
+        "musicbrainz_lookup": False,
     }
 
     with open(CONFIG_FILE, "w", opener = opener) as f:
