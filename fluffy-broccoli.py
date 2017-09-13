@@ -137,6 +137,8 @@ def main():
     )
     mpdClient = MPDClient()
     mpdClient.connect(config["mpd"]["host"], config["mpd"]["port"])
+    if "password" in config["mpd"] and config["mpd"]["password"] is not None:
+        mpdClient.password(config["mpd"]["password"])
 
     mainLoop(mastodonClient, mpdClient)
 
