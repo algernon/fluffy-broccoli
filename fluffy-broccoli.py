@@ -34,6 +34,7 @@ DEFAULTS = {
     },
     "fluffy-broccoli": {
         "format": "{artist} - {title} ({album})",
+        "tags": "NowPlaying",
         "musicbrainz_lookup": "no",
     }
 }
@@ -63,6 +64,7 @@ def findMusicBrainzAlbum(config, file):
 def mainLoop(config, mastodonClient, mpdClient):
     print("# Entering main loop...")
     previousFile = None
+    tags = " ".join(["#" + tag for tag in config["fluffy-broccoli"]["tags"].split(" ")])
 
     while True:
         mpdClient.idle("player")
@@ -77,8 +79,12 @@ def mainLoop(config, mastodonClient, mpdClient):
             albumId = findMusicBrainzAlbum(config, song["file"])
             if albumId is not None and len(albumId) > 10:
                 nowPlaying += " | https://musicbrainz.org/release/" + albumId
-        print(nowPlaying)
-        mastodonClient.toot (nowPlaying + "\n\n#NowPlaying")
+        if tags:
+            nowPlaying += "\n\n" + tags
+        print("# PLAYING:")
+        for line in nowPlaying.splitlines():
+            print("# ", line)
+        mastodonClient.toot (nowPlaying)
 
 def loadConfig():
     print("# Loading configuration...")
