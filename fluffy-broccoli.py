@@ -17,6 +17,7 @@
 
 from mpd import MPDClient
 from mastodon import Mastodon
+from urllib.parse import quote
 
 import configparser
 import io
@@ -82,6 +83,8 @@ def mainLoop(config, mastodonClient, mpdClient):
         if song["file"] == previousFile:
             continue
         previousFile = song["file"]
+        scrobbled_parts = [quote(song["artist"]), quote(song["title"])]
+        song["scrobble_uri"] = "/artist/{0}/track/{1}".format(*scrobbled_parts)
         nowPlaying = config["fluffy-broccoli"]["format"].format(**song)
         if config["fluffy-broccoli"].getboolean("musicbrainz_lookup"):
             albumId = findMusicBrainzAlbum(config, song["file"])
