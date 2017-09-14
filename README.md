@@ -1,6 +1,8 @@
 Fluffy Broccoli
 ===============
 
+[![Travis](https://img.shields.io/travis/algernon/fluffy-broccoli/master.svg?style=flat-square)](https://travis-ci.org/algernon/fluffy-broccoli)
+
 A [Mastodon][mastodon] bot that posts what you are listening to. Uses [mpd][mpd]
 to figure out the current track.
 
