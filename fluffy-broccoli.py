@@ -39,20 +39,25 @@ DEFAULTS = {
     }
 }
 
+
 def findBeetRoot():
     try:
         buf = io.StringIO()
-        sh.cut(sh.grep(sh.beet.config(), "^directory:"), "-d", ":", "-f2", _out=buf)
+        sh.cut(sh.grep(sh.beet.config(), "^directory:"),
+               "-d", ":", "-f2", _out=buf)
     except sh.CommandNotFound as e:
         return None
     return os.path.expanduser(buf.getvalue().strip())
 
+
 def findMusicBrainzAlbum(config, file):
-    if config["fluffy-broccoli"]["beet_directory"] is None:
+    beet_dir = config["fluffy-broccoli"]["beet_directory"]
+    if beet_dir is None:
         return None
     try:
         buf = io.StringIO()
-        sh.beet.list("-f", "$mb_albumid", "path:" + os.path.join(config["fluffy-broccoli"]["beet_directory"], file), _out=buf)
+        sh.beet.list("-f", "$mb_albumid",
+                     "path:" + os.path.join(beet_dir, file), _out=buf)
     except sh.CommandNotFound as e:
         return None
     id = buf.getvalue().strip()
@@ -61,10 +66,13 @@ def findMusicBrainzAlbum(config, file):
     else:
         return id
 
+
 def mainLoop(config, mastodonClient, mpdClient):
     print("# Entering main loop...")
     previousFile = None
-    tags = " ".join(["#" + tag for tag in config["fluffy-broccoli"]["tags"].split(" ")])
+    tags = " ".join(["#" + tag
+                     for tag in
+                     config["fluffy-broccoli"]["tags"].split(" ")])
 
     while True:
         mpdClient.idle("player")
@@ -84,7 +92,8 @@ def mainLoop(config, mastodonClient, mpdClient):
         print("# PLAYING:")
         for line in nowPlaying.splitlines():
             print("# ", line)
-        mastodonClient.toot (nowPlaying)
+        mastodonClient.toot(nowPlaying)
+
 
 def loadConfig():
     print("# Loading configuration...")
@@ -99,11 +108,12 @@ def loadConfig():
     config["fluffy-broccoli"]["beet_directory"] = os.path.expanduser(beet_dir)
     return config
 
+
 def configure():
     def opener(path, flags):
         return os.open(path, flags, mode=0o600)
 
-    print ("# Configuring fluffy-broccoli")
+    print("# Configuring fluffy-broccoli")
     instanceURL = input("Enter the URL of your instance: ")
     userName = input("Enter your email (used only for initial setup): ")
     password = input("Enter your password (used only for initial setup): ")
@@ -117,8 +127,8 @@ def configure():
 
     botAPI = Mastodon(
         api_base_url=instanceURL,
-        client_id = cID,
-        client_secret = cSecret
+        client_id=cID,
+        client_secret=cSecret
     )
     accessToken = botAPI.log_in(
         userName,
@@ -135,8 +145,9 @@ def configure():
         "access_token": accessToken,
     }
 
-    with open(CONFIG_FILE, "w", opener = opener) as f:
+    with open(CONFIG_FILE, "w", opener=opener) as f:
         config.write(f)
+
 
 def main():
     if not os.path.exists(CONFIG_FILE):
@@ -155,6 +166,7 @@ def main():
         mpdClient.password(config["mpd"]["password"])
 
     mainLoop(config, mastodonClient, mpdClient)
+
 
 if __name__ == "__main__":
     main()
