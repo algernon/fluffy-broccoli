@@ -23,6 +23,7 @@ import configparser
 import io
 import os
 import os.path
+import string
 import sh
 
 CONFIG_DIR = os.path.expanduser("~/.config/fluffy-broccoli")
@@ -67,9 +68,16 @@ def findMusicBrainzAlbum(config, file):
     else:
         return id
 
+class EmptyFallbackFormatter(string.Formatter):
+    def get_value(self, key, args, kwargs):
+        try:
+            return string.Formatter.get_value(self, key, args, kwargs)
+        except KeyError:
+            return ""
 
 def mainLoop(config, mastodonClient, mpdClient):
     print("# Entering main loop...")
+    fmt = EmptyFallbackFormatter()
     previousFile = None
     tags = " ".join(["#" + tag
                      for tag in
@@ -85,7 +93,7 @@ def mainLoop(config, mastodonClient, mpdClient):
         previousFile = song["file"]
         scrobbled_parts = [quote(song["artist"]), quote(song["title"])]
         song["scrobble_uri"] = "/artist/{0}/track/{1}".format(*scrobbled_parts)
-        nowPlaying = config["fluffy-broccoli"]["format"].format(**song)
+        nowPlaying = fmt.format(config["fluffy-broccoli"]["format"], **song)
         if config["fluffy-broccoli"].getboolean("musicbrainz_lookup"):
             albumId = findMusicBrainzAlbum(config, song["file"])
             if albumId is not None and len(albumId) > 10:
