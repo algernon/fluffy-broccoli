@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 ## fluffy-broccoli -- MPD #NowPlaying -> Mastodon bot
-## Copyright (C) 2017  Gergely Nagy
+## Copyright (C) 2017, 2018  Gergely Nagy
 ##
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
