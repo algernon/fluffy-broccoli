@@ -48,7 +48,7 @@ def findBeetRoot():
         sh.cut(sh.grep(sh.beet.config(), "^directory:"),
                "-d", ":", "-f2", _out=buf)
     except sh.CommandNotFound as e:
-        return None
+        return ""
     return os.path.expanduser(buf.getvalue().strip())
 
 
@@ -68,12 +68,14 @@ def findMusicBrainzAlbum(config, file):
     else:
         return id
 
+
 class EmptyFallbackFormatter(string.Formatter):
     def get_value(self, key, args, kwargs):
         try:
             return string.Formatter.get_value(self, key, args, kwargs)
         except KeyError:
             return ""
+
 
 def mainLoop(config, mastodonClient, mpdClient):
     print("# Entering main loop...")
