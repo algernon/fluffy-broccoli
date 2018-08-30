@@ -105,7 +105,7 @@ def mainLoop(config, mastodonClient, mpdClient):
         print("# PLAYING:")
         for line in nowPlaying.splitlines():
             print("# ", line)
-        mastodonClient.toot(nowPlaying)
+        mastodonClient.status_post(nowPlaying, visibility="unlisted")
 
 
 def loadConfig():
