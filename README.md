@@ -1,7 +1,7 @@
 Fluffy Broccoli
 ===============
 
-[![Travis](https://img.shields.io/travis/algernon/fluffy-broccoli/master.svg?style=flat-square)](https://travis-ci.org/algernon/fluffy-broccoli)
+[![Build Status](https://ci.madhouse-project.org/api/badges/algernon/fluffy-broccoli/status.svg?branch=master)](https://ci.madhouse-project.org/algernon/fluffy-broccoli)
 
 A [Mastodon][mastodon] bot that posts what you are listening to. Uses [mpd][mpd]
 to figure out the current track.
