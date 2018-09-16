@@ -1,0 +1,17 @@
+pipeline:
+  dco:
+    group: meta
+    image: algernon/drone-plugin-dco
+
+  signature-check:
+    group: meta
+    image: algernon/drone-plugin-signature-check
+    keys: [ 10E65DC045EABEFCC5193A26AC1E90BAC433F68F ]
+    when:
+      event: tag
+
+  flake:
+    image: python:3-alpine
+    commands:
+      - pip install --no-cache-dir flake8
+      - flake8 --ignore=E266
