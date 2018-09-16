@@ -30,4 +30,4 @@ list of available options within that file.
 License
 -------
 
-Copyright (C) 2017 Gergely Nagy, licensed under the GNU GPLv3+.
+Copyright (C) 2017, 2018 Gergely Nagy, licensed under the GNU GPLv3+.
