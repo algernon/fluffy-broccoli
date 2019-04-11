@@ -47,7 +47,7 @@ def findBeetRoot():
         buf = io.StringIO()
         sh.cut(sh.grep(sh.beet.config(), "^directory:"),
                "-d", ":", "-f2", _out=buf)
-    except sh.CommandNotFound as e:
+    except sh.CommandNotFound:
         return ""
     return os.path.expanduser(buf.getvalue().strip())
 
@@ -60,7 +60,7 @@ def findMusicBrainzAlbum(config, file):
         buf = io.StringIO()
         sh.beet.list("-f", "$mb_albumid",
                      "path:" + os.path.join(beet_dir, file), _out=buf)
-    except sh.CommandNotFound as e:
+    except sh.CommandNotFound:
         return None
     id = buf.getvalue().strip()
     if id == "":
