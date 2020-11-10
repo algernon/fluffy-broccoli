@@ -18,6 +18,7 @@
 from mpd import MPDClient
 from mastodon import Mastodon
 from urllib.parse import quote
+from xdg import xdg_config_home
 
 import configparser
 import io
@@ -26,8 +27,8 @@ import os.path
 import string
 import sh
 
-CONFIG_DIR = os.path.expanduser("~/.config/fluffy-broccoli")
-CONFIG_FILE = os.path.join(CONFIG_DIR, "config.ini")
+CONFIG_DIR = xdg_config_home().joinpath("fluffy-broccoli")
+CONFIG_FILE =  CONFIG_DIR.joinpath("config.ini")
 
 DEFAULTS = {
     "mpd": {
