@@ -28,7 +28,7 @@ import string
 import sh
 
 CONFIG_DIR = xdg_config_home().joinpath("fluffy-broccoli")
-CONFIG_FILE =  CONFIG_DIR.joinpath("config.ini")
+CONFIG_FILE = CONFIG_DIR.joinpath("config.ini")
 
 DEFAULTS = {
     "mpd": {
